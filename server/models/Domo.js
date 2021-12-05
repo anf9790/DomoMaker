@@ -24,6 +24,13 @@ const DomoSchema = new mongoose.Schema({
     required: true,
   },
 
+  // New attribute for Domomaker-E
+  domoness: {
+    type: Number,
+    min: 1,
+    required: true,
+  },
+
   owner: {
     type: mongoose.Schema.ObjectId,
     required: true,
@@ -39,6 +46,7 @@ const DomoSchema = new mongoose.Schema({
 DomoSchema.statics.toAPI = (doc) => ({
   name: doc.name,
   age: doc.age,
+  domoness: doc.domoness,
 });
 
 DomoSchema.statics.findByOwner = (ownerId, callback) => {
@@ -46,7 +54,7 @@ DomoSchema.statics.findByOwner = (ownerId, callback) => {
     owner: convertId(ownerId),
   };
 
-  return DomoModel.find(search).select('name age').lean().exec(callback);
+  return DomoModel.find(search).select('name age domoness').lean().exec(callback);
 };
 
 DomoModel = mongoose.model('Domo', DomoSchema);

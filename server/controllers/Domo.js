@@ -1,4 +1,5 @@
 const models = require('../models');
+const { DomoModel } = require('../models/Domo');
 
 const { Domo } = models;
 
@@ -14,12 +15,18 @@ const makerPage = (req, res) => {
 
 const makeDomo = (req, res) => {
   if (!req.body.name || !req.body.age) {
-    return res.status(400).json({ error: 'RAWR! Both name and age are required' });
+    return res.status(400).json({ error: 'RAWR! Name and age are required' });
   }
+
+  // Addition for Domomaker-E
+  //  Domoness will default to 1 unless something else is input.
+  let domonessVar;
+  if (!req.body.domoness) { domonessVar = 1; } else { domonessVar = req.body.domoness; }
 
   const domoData = {
     name: req.body.name,
     age: req.body.age,
+    domoness: domonessVar,
     owner: req.session.account._id,
   };
 

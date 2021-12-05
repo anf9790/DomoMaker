@@ -1,49 +1,39 @@
 "use strict";
 
-var SignupWindow = function SignupWindow(props) {
-  return /*#__PURE__*/React.createElement("form", {
-    id: "signupForm",
-    name: "signupForm",
-    onSubmit: handleSignup,
-    action: "/signup",
-    method: "POST",
-    className: "mainForm"
-  }, /*#__PURE__*/React.createElement("lab el", {
-    htmlFor: "username"
-  }, "Username: "), /*#__PURE__*/React.createElement("input", {
-    id: "user",
-    type: "text",
-    name: "username",
-    placeholder: "username"
-  }), /*#__PURE__*/React.createElement("label", {
-    htmlFor: "pass"
-  }, "Password: "), /*#__PURE__*/React.createElement("input", {
-    id: "pass",
-    type: "password",
-    name: "pass",
-    placeholder: "password"
-  }), /*#__PURE__*/React.createElement("label", {
-    htmlFor: "pass2"
-  }, "Password: "), /*#__PURE__*/React.createElement("input", {
-    id: "pass2",
-    type: "password",
-    name: "pass2",
-    placeholder: "retype password"
-  }), /*#__PURE__*/React.createElement("input", {
-    type: "hidden",
-    name: "_csrf",
-    value: props.csrf
-  }), /*#__PURE__*/React.createElement("input", {
-    className: "formSubmit",
-    type: "submit",
-    value: "Sign Up"
-  }));
+var handleLogin = function handleLogin(e) {
+  e.preventDefault();
+  $("domoMessage").animate({
+    width: 'hide'
+  }, 350);
+
+  if ($("#user").val() == '' || $("pass").val() == '') {
+    handleError("RAWR: Username or password is empty!");
+    return false;
+  }
+
+  console.log($("input[name=_csrf]").val());
+  sendAjax('POST', $("#loginForm").attr("action"), $("#loginForm").serialize(), redirect);
+  return false;
 };
 
-var createSignupWindow = function createSignupWindow(csrf) {
-  ReactDOM.render( /*#__PURE__*/React.createElement(SignupWindow, {
-    csrf: csrf
-  }), document.querySelector("#content"));
+var handleSignup = function handleSignup(e) {
+  e.preventDefault();
+  $("#domoMessage").animate({
+    width: 'hide'
+  }, 350);
+
+  if ($("#user").val() === '' || $("#pass").val() === '' || $("#pass2").val() === '') {
+    handleError("RAWR! All fields are required!");
+    return false;
+  }
+
+  if ($("#pass").val() !== $("#pass2").val()) {
+    handleError("RAWR! Passwords do not match!");
+    return false;
+  }
+
+  sendAjax('POST', $("#signupForm").attr("action"), $("#signupForm").serialized(), redirect);
+  return false;
 };
 
 var LoginWindow = function LoginWindow(props) {
@@ -75,12 +65,58 @@ var LoginWindow = function LoginWindow(props) {
   }), /*#__PURE__*/React.createElement("input", {
     className: "formSubmit",
     type: "submit",
-    value: "Sign In"
+    value: "Sign in"
+  }));
+};
+
+var SignupWindow = function SignupWindow(props) {
+  return /*#__PURE__*/React.createElement("form", {
+    id: "signupForm",
+    name: "signupForm",
+    onSubmit: handleSignup,
+    action: "/signup",
+    method: "POST",
+    className: "mainForm"
+  }, /*#__PURE__*/React.createElement("label", {
+    htmlFor: "username"
+  }, "Username: "), /*#__PURE__*/React.createElement("input", {
+    id: "user",
+    type: "text",
+    name: "username",
+    placeholder: "username"
+  }), /*#__PURE__*/React.createElement("label", {
+    htmlFor: "pass"
+  }, "Password: "), /*#__PURE__*/React.createElement("input", {
+    id: "pass",
+    type: "password",
+    name: "pass",
+    placeholder: "password"
+  }), /*#__PURE__*/React.createElement("label", {
+    htmlFor: "pass2"
+  }, "Password: "), /*#__PURE__*/React.createElement("input", {
+    id: "pass2",
+    type: "password",
+    name: "pass2",
+    placeholder: "retype password"
+  }), /*#__PURE__*/React.createElement("input", {
+    type: "hidden",
+    name: "_csrf",
+    value: props.csrf
+  }), /*#__PURE__*/React.createElement("input", {
+    className: "formSubmit",
+    type: "submit",
+    value: "Sign Up"
   }));
 };
 
 var createLoginWindow = function createLoginWindow(csrf) {
   ReactDOM.render( /*#__PURE__*/React.createElement(LoginWindow, {
+    csrf: csrf
+  }), document.querySelector("#content"));
+};
+
+var createSignupWindow = function createSignupWindow(csrf) {
+  ReactDOM.render( /*#__PURE__*/React.createElement(SignupWindow, {
     csrf: csrf
   }), document.querySelector("#content"));
 };
@@ -98,14 +134,15 @@ var setup = function setup(csrf) {
     createLoginWindow(csrf);
     return false;
   });
-  createLoginWindow(csrf); //default to login window
+  createLoginWindow(csrf); //default views
 };
 
 var getToken = function getToken() {
   sendAjax('GET', '/getToken', null, function (result) {
     setup(result.csrfToken);
   });
-};
+}; //why is this out for god and everybody??
+
 
 $(document).ready(function () {
   getToken();
@@ -119,11 +156,11 @@ var handleError = function handleError(message) {
   }, 350);
 };
 
-var redirect = function redirect(res) {
+var redirect = function redirect(response) {
   $("#domoMessage").animate({
     width: 'hide'
   }, 350);
-  window.location = res.redirect;
+  window.location = response.redirect;
 };
 
 var sendAjax = function sendAjax(type, action, data, success) {
@@ -139,39 +176,4 @@ var sendAjax = function sendAjax(type, action, data, success) {
       handleError(messageObj.error);
     }
   });
-};
-
-var handleSignup = function handleSignup(e) {
-  e.preventDefault();
-  $("#domoMessage").animate({
-    width: 'hide'
-  }, 350);
-
-  if ($("#user").val() == '' || $("#pass").val() == '' || $("#pass2").val() == '') {
-    handleError("RAWR! All fields are required");
-    return false;
-  }
-
-  if ($("#pass").val() !== $("#pass2").val()) {
-    handleError("RAWR! Passwords do not match");
-    return false;
-  }
-
-  sendAjax('POST', $("#signupForm").attr("action"), $("#signupForm").serialize(), redirect);
-  return false;
-};
-
-var handleLogin = function handleLogin(e) {
-  e.preventDefault();
-  $("#domoMessage").animate({
-    width: 'hide'
-  }, 350);
-
-  if ($("#user").val() == '' || $("#pass").val() == '') {
-    handleError("RAWR! Username or password is empty!");
-    return false;
-  }
-
-  sendAjax('POST', $("#loginForm").attr("action"), $("#loginForm").serialize(), redirect);
-  return false;
 };
