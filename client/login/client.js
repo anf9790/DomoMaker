@@ -112,7 +112,6 @@ const getToken = () => {
     });
 };
 
-//why is this out for god and everybody??
 $(document).ready(function(){
     getToken();
 });
