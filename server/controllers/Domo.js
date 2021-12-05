@@ -1,5 +1,4 @@
 const models = require('../models');
-const { DomoModel } = require('../models/Domo');
 
 const { Domo } = models;
 
@@ -18,8 +17,7 @@ const makeDomo = (req, res) => {
     return res.status(400).json({ error: 'RAWR! Name and age are required' });
   }
 
-  // Addition for Domomaker-E
-  //  Domoness will default to 1 unless something else is input.
+  // Domoness will default to 1 unless something else is input.
   let domonessVar;
   if (!req.body.domoness) { domonessVar = 1; } else { domonessVar = req.body.domoness; }
 
@@ -62,6 +60,23 @@ const getDomos = (request, response) => {
   });
 };
 
+
+const releaseDomo = (request, response) => {
+  const req = request;
+  const res = response;
+
+  console.log(req.body);
+
+  return Domo.DomoModel.removeDomo(req.body.domoId, (err) => {
+    if (err) {
+      console.log(err);
+      return res.status(400).json({ error: 'An error has occured, your domo is FREAKING out!' });
+    }
+    return res.json({ redirect: '/maker' });
+  });
+};
+
 module.exports.makerPage = makerPage;
 module.exports.getDomos = getDomos;
 module.exports.make = makeDomo;
+module.exports.releaseDomo = releaseDomo;

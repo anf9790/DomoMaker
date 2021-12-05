@@ -24,7 +24,6 @@ const DomoSchema = new mongoose.Schema({
     required: true,
   },
 
-  // New attribute for Domomaker-E
   domoness: {
     type: Number,
     min: 1,
@@ -55,6 +54,14 @@ DomoSchema.statics.findByOwner = (ownerId, callback) => {
   };
 
   return DomoModel.find(search).select('name age domoness').lean().exec(callback);
+};
+
+DomoSchema.statics.removeDomo = (domoId, callback) => {
+  const search = {
+    _id: convertId(domoId),
+  };
+
+  return DomoModel.findByIdAndDelete(search).exec(callback);
 };
 
 DomoModel = mongoose.model('Domo', DomoSchema);

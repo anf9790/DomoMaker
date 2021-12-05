@@ -1,13 +1,13 @@
 "use strict";
 
-var handleDomo = function handleDomo(e) {
+var handleDomoCapture = function handleDomoCapture(e) {
   e.preventDefault();
   $("#domoMessage").animate({
     width: 'hide'
   }, 350);
 
   if ($("#domoName").val() == '' || $("#domoAge").val() == '') {
-    handleError("RAWR! Name and age are required!");
+    handleError("RAWR! All fields are required");
     return false;
   }
 
@@ -17,10 +17,16 @@ var handleDomo = function handleDomo(e) {
   return false;
 };
 
+var handleDomoRelease = function handleDomoRelease(domo) {
+  var data = "_csrf=".concat(document.querySelector("#tokenInput").value, "&domoId=").concat(domo._id);
+  sendAjax('DELETE', '/releaseDomo', data, loadDomosFromServer);
+}; // IDK how to comment inline down there but &#8209; is a non-line-breaking dash.
+
+
 var DomoForm = function DomoForm(props) {
   return /*#__PURE__*/React.createElement("form", {
     id: "domoForm",
-    onSubmit: handleDomo,
+    onSubmit: handleDomoCapture,
     name: "domoForm",
     action: "/maker",
     method: "POST",
@@ -41,12 +47,13 @@ var DomoForm = function DomoForm(props) {
     placeholder: "Domo Age"
   }), /*#__PURE__*/React.createElement("label", {
     htmlFor: "domoness"
-  }, "Domoness: "), /*#__PURE__*/React.createElement("input", {
+  }, "Domo\u2011ness: "), /*#__PURE__*/React.createElement("input", {
     id: "domoness",
     type: "text",
     name: "domoness",
-    placeholder: "Domoness"
+    placeholder: "Domo-ness:"
   }), /*#__PURE__*/React.createElement("input", {
+    id: "tokenInput",
     type: "hidden",
     name: "_csrf",
     value: props.csrf
@@ -63,24 +70,31 @@ var DomoList = function DomoList(props) {
       className: "domoList"
     }, /*#__PURE__*/React.createElement("h3", {
       className: "emptyDomo"
-    }, "No Domos yet..."));
+    }, "No Domos yet"));
   }
 
   var domoNodes = props.domos.map(function (domo) {
     return /*#__PURE__*/React.createElement("div", {
-      className: "domo",
-      key: domo._id
+      key: domo._id,
+      className: "domo"
     }, /*#__PURE__*/React.createElement("img", {
       src: "/assets/img/domoface.jpeg",
       alt: "domo face",
       className: "domoFace"
     }), /*#__PURE__*/React.createElement("h3", {
       className: "domoName"
-    }, "Name: ", domo.name, " "), /*#__PURE__*/React.createElement("h3", {
+    }, " Name: ", domo.name, " "), /*#__PURE__*/React.createElement("h3", {
       className: "domoAge"
-    }, "Age: ", domo.age, " "), /*#__PURE__*/React.createElement("h3", {
+    }, " Age: ", domo.age, " "), /*#__PURE__*/React.createElement("h3", {
       className: "domoness"
-    }, "Domoness: ", domo.domoness, " "));
+    }, " Domo-ness: ", domo.domoness, " "), /*#__PURE__*/React.createElement("input", {
+      className: "domoRelease",
+      type: "submit",
+      value: "Release",
+      onClick: function onClick() {
+        return handleDomoRelease(domo);
+      }
+    }));
   });
   return /*#__PURE__*/React.createElement("div", {
     className: "domoList"

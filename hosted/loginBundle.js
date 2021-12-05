@@ -141,8 +141,7 @@ var getToken = function getToken() {
   sendAjax('GET', '/getToken', null, function (result) {
     setup(result.csrfToken);
   });
-}; //why is this out for god and everybody??
-
+};
 
 $(document).ready(function () {
   getToken();
